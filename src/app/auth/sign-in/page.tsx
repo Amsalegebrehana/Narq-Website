@@ -1,7 +1,30 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from '@/store/useAuthStore';
 
 const SignIn = () => {
+    const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const { signIn,  isAuthenticated, isLoading } = useAuthStore();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+          router.push('/dashboard');
+        }
+      }, [isAuthenticated, router]);
+
+    const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log("Sign in button clicked", e);
+        await signIn(email, password);
+        router.replace("/auth/success");
+    }
+
     return (
         <div className="min-h-screen bg-blue-50 flex items-center justify-center">
             <div className="bg-white rounded-3xl w-[480px] p-8 shadow-xl">
@@ -33,7 +56,7 @@ const SignIn = () => {
                 </div>
 
                 {/* Email Password Form */}
-                <form>
+                <form onSubmit={handleSignIn}>
                     <div className="space-y-4 mb-6">
                         <div>
                             <label className="block text-gray-800 mb-2 font-medium text-sm">Email address</label>
@@ -46,6 +69,8 @@ const SignIn = () => {
                                 <input
                                     type="email"
                                     placeholder="Enter your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="w-full pl-12 pr-4 py-3 font-medium border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -62,6 +87,8 @@ const SignIn = () => {
                                 <input
                                     type="password"
                                     placeholder="Enter your password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="w-full pl-12 pr-4 font-medium py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
@@ -78,8 +105,8 @@ const SignIn = () => {
                         </Link>
                     </div>
 
-                    <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors mb-6 font-medium">
-                        Sign in
+                    <button disabled={isLoading} type="submit" className="w-full cursor-pointer bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors mb-6 font-medium">
+                        {isLoading ? 'Signing in...' : 'Sign in'}
                     </button>
 
                     <div className="flex items-center gap-2 mb-6">
