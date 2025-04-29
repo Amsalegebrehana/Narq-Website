@@ -8,9 +8,11 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 const SignIn = () => {
     const router = useRouter();
+    const { signIn,  isAuthenticated, isLoading } = useAuthStore();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { signIn,  isAuthenticated, isLoading } = useAuthStore();
+    const [termsAccepted, setTermsAccepted] = useState(false);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -30,8 +32,14 @@ const SignIn = () => {
             <div className="bg-white rounded-3xl w-[480px] p-8 shadow-xl">
                 {/* Logo and Header */}
                 <div className="text-center mb-8">
-                    <div className="rounded-lg mx-auto mb-6">
-                       <p className="text-[#167EE6] text-lg font-medium">Narq</p>
+                    <div className="flex justify-center mb-6">
+                        <Image
+                            src="/assets/images/logo.png"
+                            alt="Google"
+                            width={50}
+                            height={30}
+                            className="rounded-md"
+                        />
                     </div>
                     <h1 className="text-2xl font-semibold text-gray-800 mb-2">Welcome to Narq</h1>
                     <p className="text-gray-600 font-medium">Sign in to continue to your account</p>
@@ -100,7 +108,7 @@ const SignIn = () => {
                             <input type="checkbox" className="w-4 h-4 rounded border-gray-300 cursor-pointer" />
                             <span className="text-gray-800 font-medium text-sm">Remember me</span>
                         </label>
-                        <Link href="/forgot-password" className="text-blue-700 font-medium text-sm hover:text-blue-800">
+                        <Link href="/auth/forgot-password" className="text-blue-700 font-medium text-sm hover:text-blue-800">
                             Forgot password?
                         </Link>
                     </div>
@@ -110,7 +118,7 @@ const SignIn = () => {
                     </button>
 
                     <div className="flex items-center gap-2 mb-6">
-                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 cursor-pointer" />
+                        <input type="checkbox" checked={termsAccepted} className="w-4 h-4 rounded border-gray-300 cursor-pointer" onChange={(e) => setTermsAccepted(e.target.checked)} />
                         <span className="text-gray-800 font-medium text-sm">
                             I agree to the{" "}
                             <Link href="/terms" className="text-blue-700 font-medium hover:text-blue-800">Terms of Service</Link>
@@ -121,7 +129,7 @@ const SignIn = () => {
 
                     <p className="text-center text-gray-600 font-medium">
                         Don't have an account?{" "}
-                        <Link href="/sign-up" className="text-blue-600 hover:text-blue-700">
+                        <Link href="/auth/sign-up" className="text-blue-600 hover:text-blue-700">
                             Sign up
                         </Link>
                     </p>
