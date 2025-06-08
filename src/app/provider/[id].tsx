@@ -5,9 +5,8 @@ import Header from '@/components/common/Header/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faGaugeHigh, faBell, faShieldHalved, faCopy, faPlus } from '@fortawesome/free-solid-svg-icons';
 import TeamPricingModal from '@/components/pricing/TeamPricing';
-import Link from 'next/link';
 
-const DashboardNarq = () => {
+const ProviderDetail = () => {
 
     const [showPricingModal, setShowPricingModal] = useState(false);
     const [numberOfEmployees, setNumberOfEmployees] = useState(40);
@@ -79,7 +78,7 @@ const DashboardNarq = () => {
                         <p className='text-lg font-semibod text-gray-800'>Payment Information</p>
                         <p className='text-base font-semibod text-gray-500'>Update your payment details via Stripe</p>
                     </div>
-                    <Link href={'/payment'} className='text-blue-600 font-semibod  hover:text-blue-700 cursor-pointer'>Update Payment</Link>
+                    <p className='text-blue-600 font-semibod  hover:text-blue-700 cursor-pointer'>Update Payment</p>
                 </div>
             </div>
 
@@ -121,4 +120,4 @@ const DashboardNarq = () => {
   );
 }
 
-export default DashboardNarq;
+export default ProviderDetail;
