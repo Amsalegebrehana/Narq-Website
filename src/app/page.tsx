@@ -15,7 +15,7 @@ export default function Home() {
               Join our network of trusted businesses to verify employment status and maintain workforce integrity.
             </p>
             <div className="flex justify-center gap-4">
-              <Link href="/dashboard" className="bg-gray-900 text-white px-6 py-3 rounded-md hover:bg-gray-800 font-medium">
+              <Link href="/auth/sign-in" className="bg-gray-900 text-white px-6 py-3 rounded-md hover:bg-gray-800 font-medium">
                 Get Started
               </Link>
               <Link href="/learn-more" className="bg-white text-gray-800 px-6 py-3 rounded-md border border-gray-300 hover:bg-gray-50 font-medium">
@@ -25,7 +25,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="py-16 px-4 flex justify-center">
+        {/* <div className="py-16 px-4 flex justify-center">
           <div className="max-w-md w-full bg-white p-8 border border-gray-200 rounded-lg">
             <h2 className="text-2xl font-bold mb-6 text-center">Create Your Account</h2>
             <form className="space-y-4">
@@ -85,7 +85,7 @@ export default function Home() {
               </button>
             </form>
           </div>
-        </div>
+        </div> */}
 
       </main>
       <PublicFooter />

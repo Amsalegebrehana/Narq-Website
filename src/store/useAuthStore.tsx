@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { config } from '../../config';
 
 interface User {
   id: string;
@@ -7,28 +8,26 @@ interface User {
   name?: string;
 }
 
-
 interface AuthState {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
   
   //  actions
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
+  signUp: (email: string, password: string, name?: string) => Promise<void>;
   signOut: () => void;
   clearError: () => void;
 }
-
-// to be replaced
-const MOCK_USERS: Record<string, { password: string, user: User }> = {};
 
 // Create the store with persistence
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      token: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -36,74 +35,97 @@ export const useAuthStore = create<AuthState>()(
       // Sign in implementation
       signIn: async (email, password) => {
         set({ isLoading: true, error: null });
-        
+        console.log("email, password >>>>>>>>>>>>>", email, password);
+
+        console.log("config.baseUrl ?", config.baseUrl);
         try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 800));
-          
-          // Check if user exists in our mock database
-          const userRecord = MOCK_USERS[email];
-          
-          if (!userRecord || userRecord.password !== password) {
+          const response = await fetch(`${config.baseUrl}/auth/signin`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'accept': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+          })
+          console.log("response", response);
+
+          if (!response.ok) {
             throw new Error('Invalid email or password');
           }
-          
-          // Success
+
+          const data = await response.json();
+          // Assuming the backend returns { user: User, token: string }
           set({ 
-            user: userRecord.user,
+            // user: data.user,
+            token: data.token,
             isAuthenticated: true,
             isLoading: false 
           });
+          console.log("data", data);
+
+          // Store token in localStorage for persistence
+          localStorage.setItem('auth-token', data.token);
+          return data;
         } catch (error: any) {
           set({ 
             error: error.message, 
             isLoading: false,
-            isAuthenticated: false
+            isAuthenticated: false,
+            token: null
           });
+          throw error;
         }
       },
       
       // Sign up implementation
-      signUp: async (email, password, name) => {
+      signUp: async (email, password, name="name") => {
+
+        console.log("email, password >>>>>>>>>>>>>", email, password);
+
         set({ isLoading: true, error: null });
         
         try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 800));
-          
-          // Check if email already exists
-          if (MOCK_USERS[email]) {
-            throw new Error('Email already in use');
+          console.log("config.baseUrl ?", config.baseUrl); 
+
+          const response = await fetch(`${config.baseUrl}/auth/signup`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password, name }),
+          })
+
+          if (!response.ok) {
+            throw new Error('Registration failed');
           }
-          
-          // Create new user
-          const newUser: User = {
-            id: Date.now().toString(),
-            email,
-            name
-          };
-          
-          // Save to mock DB
-          MOCK_USERS[email] = { password, user: newUser };
-          
-          //  sign in after registration
+
+          const data = await response.json();
+          // Assuming the backend returns { user: User, token: string }
           set({
-            user: newUser,
+            user: data.user,
+            token: data.token,
             isAuthenticated: true,
             isLoading: false
           });
+
+          console.log(data)
+          return data
         } catch (error: any) {
           set({
             error: error.message,
-            isLoading: false
+            isLoading: false,
+            token: null
           });
+          throw error;
         }
       },
       
       // sign out
       signOut: () => {
+        localStorage.removeItem('auth-token');
         set({ 
           user: null, 
+          token: null,
           isAuthenticated: false
         });
       },
@@ -111,8 +133,14 @@ export const useAuthStore = create<AuthState>()(
       clearError: () => set({ error: null })
     }),
     {
-      name: 'narq-auth-storage', // unique name for localStorage
+      name: 'narq-auth-storage',
       skipHydration: true, // important for SSR
+      partialize: (state) => ({
+        // Only persist these fields
+        token: state.token,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated
+      })
     }
   )
 );
